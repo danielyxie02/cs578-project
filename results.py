@@ -17,8 +17,9 @@ num_sparsities = len(sparsities)
 results = {}
 results['LeNet_5'] = {}
 results['LeNet_5']['MNIST'] = {}
+results['LeNet_5']['MNIST']['None']   = [0.9912] * num_sparsities  # no pruning => duplicate the 100% sparsity result as a reference horizontal line
 results['LeNet_5']['MNIST']['Random'] = [0.9906, 0.9906, 0.9878, 0.9793, 0.9545, 0.8288, 0.2164,]
-results['LeNet_5']['MNIST']['None'] = [0.9906] * num_sparsities  # no pruning => duplicate the 100% sparsity result as a reference horizontal line
+results['LeNet_5']['MNIST']['SNIP']   = [0.9912, 0.9904, 0.9898, 0.9892, 0.9840 ,0.9768, 0.8706,]
 
 # Generic loop to generate plots of every result
 # Change num_models, num_datasets as you will, and more subplots will be created
@@ -32,6 +33,7 @@ axs = axs.reshape(-1)
 model_color_map = {
 	"None": "black",
 	"Random": "purple",
+	"SNIP": "blue",
 }
 
 i = 0  # tracks which plot we're currently doing
@@ -44,9 +46,8 @@ for model in results.keys():
 			ax.set_xticks(np.arange(num_sparsities), [f"{s:.2f}" for s in sparsities])  # admittedly, this is kind of hacky.
 			ax.set_xlim(0, len(sparsities) - 1)
 			ax.set_xlabel("Sparsity (fraction of weights remaining)")
-			ax.set_ylim(0.8, 1)  # only really care about high-ish accuracies
+			ax.set_ylim(0.85, 1)  # only really care about high-ish accuracies
 			ax.set_ylabel("Test accuracy")
 		i += 1
 plt.figlegend()
 plt.savefig("results.png") 
-# TODO: define a legend? we probably just want 1 legend for colors, not 1 legend per subplot.
