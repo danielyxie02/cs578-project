@@ -21,7 +21,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 # (or it might not want to use a fancy training loop at all.)
 
 # Training used for random pruning: just using ignite does fine.
-def train_random(model, dataset_name, target_sparsity=1):
+def train_random_or_SNIP(which, model, dataset_name, target_sparsity):
 	# setup
 	optimizer = optim.NAdam(model.parameters())
 	loss = nn.CrossEntropyLoss()
@@ -34,7 +34,11 @@ def train_random(model, dataset_name, target_sparsity=1):
 	evaluator = create_supervised_evaluator(model, metrics, device)
 
 	# do pruning here, note: change this if you're testing a different method
-	prune.random_prune(model, target_sparsity)
+	# random and SNIP are both "prune at initialization" methods, so let's capture them here
+	if which == "random":
+		prune.random_prune(model, target_sparsity)
+	elif which == "SNIP":
+		prune.SNIP_prune(model, target_sparsity, train_loader)
 
 	# This hook logs some information an entire epoch finishes
 	timer = time.time()
@@ -49,6 +53,12 @@ def train_random(model, dataset_name, target_sparsity=1):
 		print(f"Validation Results - Epoch[{trainer.state.epoch}] Avg accuracy: {metrics['accuracy']:.4f} Best acc so far: {best_acc} Time (seconds): {(time.time() - timer):.4f}")
 		timer = time.time()
 	
-	print(f"Start training for random pruning, sparsity {target_sparsity}")
+	print(f"Start training for {which} pruning, sparsity {target_sparsity}")
 	trainer.run(train_loader, max_epochs=50)
-	print(f"Training finished for random pruning, best test accuracy for sparsity {target_sparsity}: {best_acc}")
+	print(f"Training finished for {which} pruning, best test accuracy for sparsity {target_sparsity}: {best_acc}")
+
+def train_random(model, dataset_name, target_sparsity=1):
+	train_random_or_SNIP("random", model, dataset_name, target_sparsity)
+
+def train_SNIP(model, dataset_name, target_sparsity=1):
+	train_random_or_SNIP("SNIP", model, dataset_name, target_sparsity)

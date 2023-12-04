@@ -15,5 +15,5 @@ if __name__ == "__main__":
 		# Can manually change the next three lines based on what you want to test
 		model = models.LeNet_5().to(device)
 		dataset_name = "MNIST"  # we'll probably stick to MNIST
-		train.train_random(model, dataset_name, sparsity)  # probably want to manually change this call based on pruning method
+		train.train_SNIP(model, dataset_name, sparsity)  # probably want to manually change this call based on pruning method
 	print("done")
