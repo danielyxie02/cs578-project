@@ -3,6 +3,12 @@ from torchvision.datasets import MNIST, CIFAR10
 from torchvision.transforms import Compose, ToTensor, Normalize
 from torchvision import transforms
 
+def get_dataloaders(name, train_batch_size, val_batch_size):
+	if (name == "MNIST"):
+		return get_mnist_dataloaders(train_batch_size, val_batch_size)
+	else:
+		print("Dataset name not recognized")
+
 def get_mnist_dataloaders(train_batch_size, val_batch_size):
 
 	data_transform = Compose([transforms.ToTensor()])
