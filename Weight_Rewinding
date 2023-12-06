@@ -1,7 +1,7 @@
 # Import from self-created files
 import models
 import datasets
-import weight_rewinding_LeNet5 as wr
+import weight_rewinding_support as wr
 
 # Import Torch and other packages
 import torch
