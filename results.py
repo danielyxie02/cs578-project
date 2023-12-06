@@ -63,9 +63,9 @@ for (model, dataset) in results_names:
 			ax.plot(np.arange(num_sparsities), results[model][dataset][method], color=model_color_map[method], label=method)
 		else:
 			ax.plot(np.arange(num_sparsities), results[model][dataset][method], marker='o', color=model_color_map[method], label=method)
-		ax.set_xticks(np.arange(num_sparsities), [f"{s:.2f}" for s in sparsities])  # admittedly, this is kind of hacky.
+		ax.set_xticks(np.arange(num_sparsities), [f"{s*100:.2f}" for s in sparsities])  # admittedly, this is kind of hacky.
 		ax.set_xlim(0, len(sparsities) - 1)
-		ax.set_xlabel("Sparsity (fraction of weights remaining)")
+		ax.set_xlabel("Sparsity (percent of weights remaining)")
 		ax.set_ylim(0.85, 1)  # only really care about high-ish accuracies
 		ax.set_ylabel("Test accuracy")
 	i += 1
