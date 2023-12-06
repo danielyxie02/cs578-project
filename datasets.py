@@ -4,10 +4,13 @@ from torchvision.transforms import Compose, ToTensor, Normalize
 from torchvision import transforms
 
 def get_dataloaders(name, train_batch_size, val_batch_size):
-	if (name == "MNIST"):
-		return get_mnist_dataloaders(train_batch_size, val_batch_size)
-	else:
-		print("Dataset name not recognized")
+	match name:
+		case "MNIST":
+			return get_mnist_dataloaders(train_batch_size, val_batch_size)
+		case "CIFAR10":
+			return get_cifar10_dataloaders(train_batch_size, val_batch_size)
+		case _:
+			print("Dataset name not recognized")
 
 def get_mnist_dataloaders(train_batch_size, val_batch_size):
 
@@ -16,6 +19,38 @@ def get_mnist_dataloaders(train_batch_size, val_batch_size):
 	train_dataset = MNIST("_dataset", True, data_transform, download=True)
 	test_dataset = MNIST("_dataset", False, data_transform, download=False)
 
+	train_loader = DataLoader(
+		train_dataset,
+		train_batch_size,
+		shuffle=True,
+		num_workers=2,
+		pin_memory=True)
+	val_loader = DataLoader(
+		test_dataset,
+		val_batch_size,
+		shuffle=False,
+		num_workers=2,
+		pin_memory=True)
+
+	return train_loader, val_loader
+
+def get_cifar10_dataloaders(train_batch_size, val_batch_size):
+	train_transform = transforms.Compose([
+		transforms.RandomCrop(32, padding=4),
+		transforms.RandomHorizontalFlip(),
+		transforms.ToTensor(),
+		transforms.Normalize((0.4914, 0.4822, 0.4465),
+							(0.2023, 0.1994, 0.2010)),
+	])
+
+	test_transform = transforms.Compose([
+		transforms.ToTensor(),
+		transforms.Normalize((0.4914, 0.4822, 0.4465),
+							(0.2023, 0.1994, 0.2010)),
+	])
+
+	train_dataset = CIFAR10('_dataset', True, train_transform, download=True)
+	test_dataset = CIFAR10('_dataset', False, test_transform, download=False)
 	train_loader = DataLoader(
 		train_dataset,
 		train_batch_size,
