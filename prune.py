@@ -95,3 +95,75 @@ def SNIP_prune(model, target_sparsity, dataloader):
 				return hook
 			layer.weight.register_hook(get_hook(snip_mask[i]))
 			i += 1  # move on to the next layer
+
+def weight_rewind_prune(model, target_sparsity):
+	for name, module in model.named_modules():
+		if isinstance(module, torch.nn.Conv2d):
+			prune.l1_unstructured(module, name='weight', amount=1-target_sparsity)
+  
+		elif isinstance(module, torch.nn.Linear):
+			prune.l1_unstructured(module, name='weight', amount=1-target_sparsity)
+	# Reinitialize weights to 0
+	print('Reinitializing Weights')	
+	for layer in model.modules():
+		if isinstance(layer, nn.Conv2d) or isinstance(layer, nn.Linear):
+			layer.weight.data.fill_(0)
+
+	# Fix gradients at 0 for those in mask with value 0
+	print("Starting to apply mask and fix gradients at 0") 
+	for layer in model.modules():
+		if isinstance(layer, nn.Conv2d) or isinstance(layer, nn.Linear):
+			assert(layer.weight.shape == layer.weight_mask.shape)
+			# set initial weights in real model according to mask
+			layer.weight.data[layer.weight_mask == 0.0] = 0.0
+
+			# tell pruned weights to always have 0 gradient; combined, these params will be forever 0
+			# done with some help from
+			# https://discuss.pytorch.org/t/use-forward-pre-hook-to-modify-nn-module-parameters/108498/5
+			def get_hook(mask):
+				def hook(grad):
+					return grad * mask
+				return hook
+			layer.weight.register_hook(get_hook(layer.weight_mask))
+	print('Done applying Mask')
+
+def weight_rewind_prune_use_old_model(model, old_model, target_sparsity):
+	for name, module in model.named_modules():
+		if isinstance(module, torch.nn.Conv2d):
+			prune.l1_unstructured(module, name='weight', amount=1-target_sparsity)
+  
+		elif isinstance(module, torch.nn.Linear):
+			prune.l1_unstructured(module, name='weight', amount=1-target_sparsity)
+	# Reinitialize weights to those in old_model
+	print('Reinitializing Weights')	
+	for (layer, old_layer) in zip(model.modules(), old_model.modules()):
+		if isinstance(layer, nn.Conv2d) or isinstance(layer, nn.Linear):
+			layer.weight.data = copy.deepcopy(old_layer.weight.data)
+
+	# Fix gradients at 0 for those in mask with value 0
+	print("Starting to apply mask and fix gradients at 0") 
+	for layer in model.modules():
+		if isinstance(layer, nn.Conv2d) or isinstance(layer, nn.Linear):
+			assert(layer.weight.shape == layer.weight_mask.shape)
+			# set initial weights in real model according to mask
+			layer.weight.data[layer.weight_mask == 0.0] = 0.0
+
+			# tell pruned weights to always have 0 gradient; combined, these params will be forever 0
+			# done with some help from
+			# https://discuss.pytorch.org/t/use-forward-pre-hook-to-modify-nn-module-parameters/108498/5
+			def get_hook(mask):
+				def hook(grad):
+					return grad * mask
+				return hook
+			layer.weight.register_hook(get_hook(layer.weight_mask))
+	print('Done applying Mask')
+
+def spars_calc(model):
+    spars = 0
+    full = 0
+    for layer in model.modules():
+        if isinstance(layer, nn.Conv2d) or isinstance(layer, nn.Linear):
+            spars += float(torch.sum(layer.weight == 0))
+            full += int(layer.weight.nelement())
+    print("Global sparsity: {:.4f}%".format(100 * float(spars) / float(full)))
+    return spars,full
