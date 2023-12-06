@@ -71,7 +71,7 @@ def weight_rewind_prune(model, target_sparsity):
   
 		elif isinstance(module, torch.nn.Linear):
 			prune.l1_unstructured(module, name='weight', amount=target_sparsity)
-	# Rewind weights to 0
+	# Reinitialize weights to 0
 	print('Reinitializing Weights')	
 	for layer in model.modules():
 		if isinstance(layer, nn.Conv2d) or isinstance(layer, nn.Linear):
@@ -95,7 +95,14 @@ def weight_rewind_prune(model, target_sparsity):
 			layer.weight.register_hook(get_hook(layer.weight_mask))
 	print('Done applying Mask')
 
-
-
+def spars_calc(model):
+    spars = 0
+    full = 0
+    for layer in model.modules():
+        if isinstance(layer, nn.Conv2d) or isinstance(layer, nn.Linear):
+            spars += float(torch.sum(layer.weight == 0))
+            full += int(layer.weight.nelement())
+    print("Global sparsity: {:.2f}%".format(100 * float(spars) / float(full)))
+    return spars,full
 
 
