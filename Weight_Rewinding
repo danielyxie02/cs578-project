@@ -13,6 +13,10 @@ from ignite.metrics import Accuracy, Loss
 from ignite.engine import Events, create_supervised_trainer, create_supervised_evaluator
 import time
 
+# Initialize Model and Check initial sparsity
+model = models.LeNet_5()
+wr.spars_calc(model)
+
 # Train Initial Model
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 model = models.LeNet_5()
@@ -23,5 +27,8 @@ sparsities = [1.0 / (2 ** i) for i in range(7)]
 print(sparsities)
 wr.weight_rewind_prune(model,1-sparsities[6])
 
-# Retrain with pruned network and weights reset
+# Train Pruned Model
 wr.train(model,3)
+
+# Calculate Final Sparsity
+wr.spars_calc(model)
