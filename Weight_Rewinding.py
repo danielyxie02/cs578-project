@@ -23,7 +23,7 @@ model = models.LeNet_5()
 wr.train(model,3)
 
 # Prune Parameters 
-sparsities = [1.0 / (2 ** i) for i in range(7)]
+sparsities = [1.0 / (2 ** i) for i in range(9)]
 print(sparsities)
 wr.weight_rewind_prune(model,1-sparsities[6])
 
