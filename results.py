@@ -20,7 +20,7 @@ results['LeNet_5']['MNIST'] = {}
 results['LeNet_5']['MNIST']['None']   = [0.9912] * num_sparsities  # no pruning => duplicate the 100% sparsity result as a reference horizontal line
 results['LeNet_5']['MNIST']['Random'] = [0.9906, 0.9906, 0.9878, 0.9793, 0.9545, 0.8288, 0.2164, 0.1135, 0.1135]
 results['LeNet_5']['MNIST']['SNIP']   = [0.9912, 0.9904, 0.9898, 0.9892, 0.9840, 0.9768, 0.8706, 0.1135, 0.1135]
-results['LeNet_5']['MNIST']['Rewind'] = [0.9923, 0.9923, 0.9918, 0.9890, 0.9853, 0.9692, 0.7157, 0.4603, 0.0994]
+results['LeNet_5']['MNIST']['Rewind'] = [0.9923, 0.9921, 0.9918, 0.9890, 0.9853, 0.9692, 0.7157, 0.4603, 0.0994]
 
 results['LeNet_300_100'] = {}
 results['LeNet_300_100']['MNIST'] = {}
