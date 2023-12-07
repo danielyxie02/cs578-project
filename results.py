@@ -43,6 +43,12 @@ agpL3sparsities = [1,.78,.57,.373,.18,.045,.0102]
 results['LeNet_5]['MNIST']['AGP'] = [.9858, .9858, .9852, .9849, .973, .89]
 results['LeNet_5]['MNIST']['AGP'] = [.973, .972, .9695, .967, .97, .948, .4971]
 
+# Gregg's additions for changed weight reinitialization
+results['LeNet_5']['MNIST']['Rewind_randinit'] = [0.9923, 0.9919, 0.9893, 0.9811, 0.9355, 0.3665, 0.1135, 0.1135, 0.1135]
+results['LeNet_300_100']['MNIST']['Rewind_randinit'] = [0.9825, 0.9833, 0.9813, 0.9804, 0.9699, 0.9437, 0.5034, 0.248, 0.1886]
+
+
+
 results_names = [
 	('LeNet_5', 'MNIST'),
 	('LeNet_300_100', 'MNIST'),
