@@ -27,7 +27,8 @@ results['LeNet_300_100']['MNIST'] = {}
 results['LeNet_300_100']['MNIST']['None']   = [0.9835] * num_sparsities
 results['LeNet_300_100']['MNIST']['Random'] = [0.9824, 0.9827, 0.9803, 0.9766, 0.9632, 0.9383, 0.5814, 0.2952, 0.114]
 results['LeNet_300_100']['MNIST']['SNIP']   = [0.9835, 0.9831, 0.9817, 0.9822, 0.9749, 0.9707, 0.9574, 0.9197, 0.7129]
-results['LeNet_300_100']['MNIST']['Rewind'] = []
+results['LeNet_300_100']['MNIST']['Rewind'] = [0.9826, 0.9824, 0.9828, 0.9826, 0.9790, 0.9763, 0.9623, 0.5758, 0.4545]
+
 
 results['ResNet18'] = {}
 results['ResNet18']['MNIST'] = {} 
