@@ -47,8 +47,6 @@ results['LeNet_5']['MNIST']['AGP'] = [.973, .972, .9695, .967, .97, .948, .4971]
 results['LeNet_5']['MNIST']['Rewind_randinit'] = [0.9923, 0.9919, 0.9893, 0.9811, 0.9355, 0.3665, 0.1135, 0.1135, 0.1135]
 results['LeNet_300_100']['MNIST']['Rewind_randinit'] = [0.9825, 0.9833, 0.9813, 0.9804, 0.9699, 0.9437, 0.5034, 0.248, 0.1886]
 
-
-
 results_names = [
 	('LeNet_5', 'MNIST'),
 	('LeNet_300_100', 'MNIST'),
@@ -64,9 +62,11 @@ axs = axs.reshape(-1)
 
 # Let's just define which pruning method maps to which color. 
 model_color_map = {
-	"None": "black",
+	"None": "red",
 	"Random": "purple",
 	"SNIP": "blue",
+	"Rewind": "orange",
+	"AGP": "green",
 }
 
 i = 0  # tracks which plot we're currently doing
@@ -76,14 +76,20 @@ for (model, dataset) in results_names:
 	for method in results[model][dataset].keys():
 		ax.title.set_text(f"{model} on {dataset}")
 		if (method == "None"):
-			ax.plot(np.arange(num_sparsities), results[model][dataset][method], color=model_color_map[method], label=method)
+			ax.plot(sparsities, results[model][dataset][method], color=model_color_map[method], label=method)
+		elif method == "AGP":
+			if model == "LeNet_5":
+				ax.plot(agpL5sparsities, results[model][dataset][method], marker='o', color=model_color_map[method], label=method)
+			else:
+				ax.plot(agpL3sparsities, results[model][dataset][method], marker='o', color=model_color_map[method], label=method)
 		else:
-			ax.plot(np.arange(num_sparsities), results[model][dataset][method], marker='o', color=model_color_map[method], label=method)
-		ax.set_xticks(np.arange(num_sparsities), [f"{s*100:.2f}" for s in sparsities])  # admittedly, this is kind of hacky.
-		ax.set_xlim(0, len(sparsities) - 1)
-		ax.set_xlabel("Sparsity (percent of weights remaining)")
-		ax.set_ylim(0.85, 1)  # only really care about high-ish accuracies
-		ax.set_ylabel("Test accuracy")
+			ax.plot(sparsities, results[model][dataset][method], marker='o', color=model_color_map[method], label=method)
+	ax.set_xscale("log")
+	ax.set_xticks(sparsities, [f"{s*100:.2f}" for s in sparsities])
+	ax.set_xlim(1.0 / (2 ** 8), 1)
+	ax.set_xlabel("Percent of weights remaining")
+	ax.set_ylim(0.9, 1)  # only really care about high-ish accuracies
+	ax.set_ylabel("Test accuracy")
 	i += 1
 lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
 lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
